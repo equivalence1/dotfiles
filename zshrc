@@ -1,15 +1,30 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+source ~/.profile
+
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
+SHARE_HISTORY="false"
+
 # Path to your oh-my-zsh installation.
-  export ZSH=/home/equi/.oh-my-zsh
+export ZSH=/home/equi/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="robbyrussell"
 ZSH_THEME="powerlevel9k/powerlevel9k"
-#POWERLEVEL9K_MODE='awesome-fontconfig'
+
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status dir rbenv vcs)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(root_indicator background_jobs)
+
+if [ "$COLORTERM" = "gnome-terminal" ]; then
+    export TERM=gnome-256color
+fi
+
+# POWERLEVEL9K_MODE='awesome-fontconfig'
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -34,7 +49,7 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -91,6 +106,12 @@ alias la='ls -A'
 alias l='ls -CF'
 alias lah='ls -lahF'
 
+# simplify the use of the tool to generate lexer and parser
+alias antlr4='java -jar /usr/local/lib/antlr-4.7-complete.jar'
+# simplify the use of the tool to test the generated code
+alias grun='java org.antlr.v4.gui.TestRig'
+
+
 # Распаковка архивов
 # example: extract file
 extract () {
@@ -116,21 +137,32 @@ extract () {
 }
 
 # Запаковать архив
-# example: pk tar file
-pk () {
+# example: pack tar file
+pack () {
  if [ $1 ] ; then
  case $1 in
  tbz)       tar cjvf $2.tar.bz2 $2      ;;
  tgz)       tar czvf $2.tar.gz  $2       ;;
- tar)      tar cpvf $2.tar  $2       ;;
- bz2)    bzip $2 ;;
+ tar)       tar cpvf $2.tar  $2       ;;
+ bz2)       bzip $2 ;;
  gz)        gzip -c -9 -n $2 > $2.gz ;;
  zip)       zip -r $2.zip $2   ;;
  7z)        7z a $2.7z $2    ;;
- *)         echo "'$1' cannot be packed via pk()" ;;
+ *)         echo "'$1' cannot be packed via pack()" ;;
  esac
  else
  echo "'$1' is not a valid file"
  fi
-
 }
+
+# ros
+source /opt/ros/lunar/setup.zsh
+
+# Dont share history among tabs
+unsetopt share_history
+
+# nvm
+export NVM_DIR="/home/equi/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+export CDPATH=/home/equi/acronis/dmitrii.kravchenko/pstorage-core:/home/equi/AU/term7

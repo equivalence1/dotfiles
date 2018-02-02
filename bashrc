@@ -148,9 +148,16 @@ alias emacs='emacs -nw'
 # rust
 export PATH="$PATH:$HOME/.cargo/bin/"
 
+# go
+export PATH="$PATH:/usr/local/go/bin"
+
 # tbb
 export TBB_INSTALL_DIR="$HOME/tbbsrc"
 export TBB_INCLUDE="$TBB_INSTALL_DIR/include"
 export TBB_LIBRARY_RELEASE="$TBB_INSTALL_DIR/build/linux_intel64_gcc_cc5.4.0_libc2.23_kernel4.4.0_release"
 export TBB_LIBRARY_DEBUG="$TBB_INSTALL_DIR/build/linux_intel64_gcc_cc5.4.0_libc2.23_kernel4.4.0_debug"
 # compilation string: g++ main.cpp -I$TBB_INCLUDE -Wl,-rpath,$TBB_LIBRARY_RELEASE -L$TBB_LIBRARY_RELEASE -ltbb
+source /opt/ros/lunar/setup.bash
+
+export NVM_DIR="/home/equi/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm

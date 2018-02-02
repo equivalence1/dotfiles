@@ -6,7 +6,7 @@ syntax on
 set nocompatible
 " Just move them to tmp
 set swapfile
-set dir=~/tmp
+set dir=/tmp
 " Autoload files that have changed outside of vim
 set autoread
 " Always show cursor
@@ -40,10 +40,13 @@ set ttymouse=xterm2
 " Highlight the current line
 set cursorline
 " highlight a matching [{()}] when cursor is placed on start/end character
-set showmatch
+" set showmatch
 
 set ai
 set si
+
+" tmux: don't erase background color
+set t_ut=
 
 " Use system clipboard
 " http://stackoverflow.com/questions/8134647/copy-and-paste-in-vim-via-keyboard-between-different-mac-terminals
@@ -56,6 +59,9 @@ set pastetoggle=<F2>
 
 " syntax for sql
 let g:sql_type_default = 'pgsql'
+
+" Agda
+let g:agda_extraincpaths = ["/usr/share/agda-stdlib"]
 
 colorscheme badwolf
 
@@ -80,6 +86,10 @@ Plugin 'git://git.wincent.com/command-t.git'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'rust-lang/rust.vim'
 Plugin 'dag/vim2hs'
+Plugin 'derekwyatt/vim-scala'
+Plugin 'derekelkins/agda-vim'
+Plugin 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+Plugin 'terryma/vim-multiple-cursors'
 
 call vundle#end()
 
@@ -106,7 +116,7 @@ let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/
 " }}}
 
 " for powerline
-set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
+" set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
 
 execute pathogen#infect()
 call pathogen#helptags()
@@ -114,11 +124,11 @@ call pathogen#helptags()
 " }}}
 
 
-
 " Mappings {{{
 
 " for powerline
 vnoremap <silent> # :call VisualSelection('b')<CR>
+
 map <F5> :edit!<cr>
 map <c-s> :w<cr>
 map <c-z> :undo<cr>
@@ -132,12 +142,52 @@ nmap <F7> :NERDTreeToggle<CR>
 " open it automatically
 " autocmd vimenter * NERDTree
 
-nnoremap <C-S-tab> :tabprevious<CR>
-nnoremap <C-tab>   :tabnext<CR>
-nnoremap <C-t>     :tabnew<CR>
+
+" Agda
+let maplocalleader = ","
+
+command! -nargs=0 Load call Load(0)
+command! -nargs=0 AgdaVersion call AgdaVersion(0)
+command! -nargs=0 Reload silent! make!|redraw!
+command! -nargs=0 RestartAgda exec s:python_cmd 'RestartAgda()'
+command! -nargs=0 ShowImplicitArguments exec s:python_cmd "sendCommand('ShowImplicitArgs True')"
+command! -nargs=0 HideImplicitArguments exec s:python_cmd "sendCommand('ShowImplicitArgs False')"
+command! -nargs=0 ToggleImplicitArguments exec s:python_cmd "sendCommand('ToggleImplicitArgs')"
+command! -nargs=0 Constraints exec s:python_cmd "sendCommand('Cmd_constraints')"
+command! -nargs=0 Metas exec s:python_cmd "sendCommand('Cmd_metas')"
+command! -nargs=0 SolveAll exec s:python_cmd "sendCommand('Cmd_solveAll')"
+command! -nargs=1 ShowModule call ShowModule(<args>)
+command! -nargs=1 WhyInScope call WhyInScope(<args>)
+command! -nargs=1 SetRewriteMode exec s:python_cmd "setRewriteMode('<args>')"
+
+nnoremap <buffer> <LocalLeader>l :Reload<CR>
+nnoremap <buffer> <LocalLeader>t :call Infer()<CR>
+nnoremap <buffer> <LocalLeader>r :call Refine("False")<CR>
+nnoremap <buffer> <LocalLeader>R :call Refine("True")<CR>
+nnoremap <buffer> <LocalLeader>g :call Give()<CR>
+nnoremap <buffer> <LocalLeader>c :call MakeCase()<CR>
+nnoremap <buffer> <LocalLeader>a :call Auto()<CR>
+nnoremap <buffer> <LocalLeader>e :call Context()<CR>
+nnoremap <buffer> <LocalLeader>n :call Normalize("False")<CR>
+nnoremap <buffer> <LocalLeader>N :call Normalize("True")<CR>
+nnoremap <buffer> <LocalLeader>M :call ShowModule('')<CR>
+nnoremap <buffer> <LocalLeader>y :call WhyInScope('')<CR>
+nnoremap <buffer> <LocalLeader>m :Metas<CR>
+
+let maplocalleader = "\\"
+
+" Show/reload metas
+nnoremap <buffer> <C-e> :Metas<CR>
+inoremap <buffer> <C-e> <C-o>:Metas<CR>
+
+" Go to next/previous meta
+nnoremap <buffer> <silent> <C-g>  :let _s=@/<CR>/ {!\\| ?<CR>:let @/=_s<CR>2l
+inoremap <buffer> <silent> <C-g>  <C-o>:let _s=@/<CR><C-o>/ {!\\| ?<CR><C-o>:let @/=_s<CR><C-o>2l
+
+nnoremap <buffer> <silent> <C-y>  2h:let _s=@/<CR>? {!\\| \?<CR>:let @/=_s<CR>2l
+inoremap <buffer> <silent> <C-y>  <C-o>2h<C-o>:let _s=@/<CR><C-o>? {!\\| \?<CR><C-o>:let @/=_s<CR><C-o>2l
 
 " }}}
-
 
 
 " Commands {{{
@@ -165,7 +215,9 @@ autocmd BufRead * normal zM
 
 " }}}
 
-au BufNewFile *.cpp 0r ~/.vim/template.cpp | let IndentStyle = "cpp"
+" ACM {{{
 
+" au BufNewFile *.cpp 0r ~/.vim/template.cpp | let IndentStyle = "cpp"
+" command Compile !g++ -O2 -std=c++11 -Wall -Wextra -DLOCAL -Wpedantic %:t
 
-command Compile !g++ -O2 -std=c++11 -Wall -Wextra -DLOCAL -Wpedantic %:t
+" }}}
